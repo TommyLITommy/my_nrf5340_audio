@@ -119,11 +119,11 @@ int nrf5340_audio_dk_init(void)
 		return ret;
 	}
 
-	// ret = debug_gpio_init();
-	// if (ret) {
-	// 	LOG_ERR("Failed to initialize debug module");
-	// 	return ret;
-	// }
+	ret = debug_gpio_init();
+	if (ret) {
+		LOG_ERR("Failed to initialize debug module");
+		return ret;
+	}
 
 	ret = button_handler_init();
 	if (ret) {

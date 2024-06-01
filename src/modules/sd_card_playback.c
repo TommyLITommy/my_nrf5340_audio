@@ -17,6 +17,7 @@
 #include "pcm_mix.h"
 #include "audio_system.h"
 #include "zephyr/kernel.h"
+#include "debug_gpio.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(sd_card_playback, CONFIG_MODULE_SD_CARD_PLAYBACK_LOG_LEVEL);
@@ -237,6 +238,7 @@ static int sd_card_playback_play_wav(void)
 	n_iter = ceil((float)audio_length_bytes / (float)wav_read_size);
 
 	for (int i = 0; i < n_iter; i++) {
+		debug_gpio_toggle(DEBUG_GPIO_ID_P1_13);
 		/* Read a chunk of audio data from file */
 		ret = sd_card_read(pcm_mono_frame, &wav_read_size, &f_seg_read_entry);
 		if (ret < 0) {

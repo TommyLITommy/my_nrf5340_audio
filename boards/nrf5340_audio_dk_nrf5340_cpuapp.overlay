@@ -1,15 +1,19 @@
 / {
     gpio_custom {
         compatible = "gpio-leds";
-        debug01: debug01 {
-            gpios = < &gpio1 0x1 0xc>;
+        debug01: dbg01 {
+            gpios = < &gpio1 0xc 0 >;
             label = "debug gpio p1.12";
+        };
+        debug02: dbg02 {
+            gpios = < &gpio1 0xd 0 >;
+            label = "debug gpio p1.13";
         };
     };
     aliases {
-        dbg01 = &debug01;
+        debug01 = &debug01;
+        debug02 = &debug02;
     };
-
 };
 
 // &leds{

@@ -12,6 +12,7 @@
 
 #include "macros_common.h"
 #include "data_fifo.h"
+#include "debug_gpio.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(audio_usb, CONFIG_MODULE_AUDIO_USB_LOG_LEVEL);
@@ -88,6 +89,8 @@ static void data_received(const struct device *dev, struct net_buf *buffer, size
 		net_buf_unref(buffer);
 		return;
 	}
+
+	debug_gpio_toggle(DEBUG_GPIO_ID_P1_12);
 
 	if (buffer == NULL || size == 0 || buffer->data == NULL) {
 		/* This should never happen */

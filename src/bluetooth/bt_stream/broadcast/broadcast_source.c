@@ -193,7 +193,7 @@ static void public_broadcast_features_set(uint8_t *features)
 }
 #endif /* (CONFIG_AURACAST) */
 
-static int adv_create(void)
+static int adv_create(char *broadcast_name)
 {
 	int ret;
 	uint32_t broadcast_id = 0;
@@ -215,15 +215,22 @@ static int adv_create(void)
 		broadcast_id = CONFIG_BT_AUDIO_BROADCAST_ID_FIXED;
 	}
 
-	if (IS_ENABLED(CONFIG_BT_AUDIO_USE_BROADCAST_NAME_ALT)) {
-		ext_ad[0] = (struct bt_data)BT_DATA(BT_DATA_BROADCAST_NAME,
-						    CONFIG_BT_AUDIO_BROADCAST_NAME_ALT,
-						    sizeof(CONFIG_BT_AUDIO_BROADCAST_NAME_ALT) - 1);
+	if (broadcast_name == NULL) {
+		if (IS_ENABLED(CONFIG_BT_AUDIO_USE_BROADCAST_NAME_ALT)) {
+			ext_ad[0] = (struct bt_data)BT_DATA(BT_DATA_BROADCAST_NAME,
+								CONFIG_BT_AUDIO_BROADCAST_NAME_ALT,
+								sizeof(CONFIG_BT_AUDIO_BROADCAST_NAME_ALT) - 1);
+			} else {
+				ext_ad[0] = (struct bt_data)BT_DATA(BT_DATA_BROADCAST_NAME,
+									CONFIG_BT_AUDIO_BROADCAST_NAME,
+									sizeof(CONFIG_BT_AUDIO_BROADCAST_NAME) - 1);
+		}
 	} else {
 		ext_ad[0] = (struct bt_data)BT_DATA(BT_DATA_BROADCAST_NAME,
-						    CONFIG_BT_AUDIO_BROADCAST_NAME,
-						    sizeof(CONFIG_BT_AUDIO_BROADCAST_NAME) - 1);
+									broadcast_name,
+									strlen(broadcast_name));							
 	}
+
 
 	/* Setup extended advertising data */
 	net_buf_simple_add_le16(&brdcst_id_buf, BT_UUID_BROADCAST_AUDIO_VAL);
@@ -419,6 +426,8 @@ int broadcast_source_disable(void)
 	return 0;
 }
 
+char broadcast_src_name[] = "I'm Tommy";
+
 int broadcast_source_enable(void)
 {
 	int ret;
@@ -500,7 +509,7 @@ int broadcast_source_enable(void)
 	}
 
 	/* Create advertising set */
-	ret = adv_create();
+	ret = adv_create(broadcast_src_name);
 	if (ret) {
 		LOG_ERR("Failed to create advertising set");
 		return ret;

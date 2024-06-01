@@ -398,11 +398,11 @@ int main(void)
 	ret = bt_mgmt_adv_start(ext_adv, ext_adv_size, per_adv, per_adv_size, false);
 	ERR_CHK_MSG(ret, "Failed to start advertiser");
 
-	ret = bt_le_adv_start(BT_LE_ADV_CONN_CUSTOM, ad, ARRAY_SIZE(ad), sd, ARRAY_SIZE(sd));
-	ERR_CHK_MSG(ret, "Failed to start advertiser");
+	// ret = bt_le_adv_start(BT_LE_ADV_CONN_CUSTOM, ad, ARRAY_SIZE(ad), sd, ARRAY_SIZE(sd));
+	// ERR_CHK_MSG(ret, "Failed to start advertiser");
 
-	k_work_init(&adv_work, advertising_process);
-	bt_nus_init(&nus_cb);
+	// k_work_init(&adv_work, advertising_process);
+	// bt_nus_init(&nus_cb);
 
 	return 0;
 }
