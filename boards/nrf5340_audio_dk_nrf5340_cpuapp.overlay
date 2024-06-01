@@ -1,0 +1,20 @@
+/ {
+    gpio_custom {
+        compatible = "gpio-leds";
+        debug01: debug01 {
+            gpios = < &gpio1 0x1 0xc>;
+            label = "debug gpio p1.12";
+        };
+    };
+    aliases {
+        dbg01 = &debug01;
+    };
+
+};
+
+// &leds{
+//     led_9 {
+//         gpios = < &gpio1 0x1 0xc >;
+//         label = "dbg_p1.12 LED_MONO_PINK";
+//     };
+// };
