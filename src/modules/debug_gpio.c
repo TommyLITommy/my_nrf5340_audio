@@ -8,6 +8,7 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/devicetree.h>
 #include "debug_gpio.h"
+#include "macros_common.h"
 
 // /* 1000 msec = 1 sec */
 // #define SLEEP_TIME_MS   1000
@@ -52,6 +53,15 @@ static const struct gpio_dt_spec debug_gpios[] = {
 int debug_gpio_toggle(DEBUG_GPIO_ID_t gpio_id) 
 {
 	gpio_pin_toggle_dt(&debug_gpios[gpio_id]);
+	return 0;
+}
+
+int debug_gpio_set_level(DEBUG_GPIO_ID_t gpio_id, uint8_t level)
+{
+	
+	__ASSERT(level <= 1, "level is bigger thant 1!");
+
+	gpio_pin_set_dt(&debug_gpios[gpio_id], level);
 	return 0;
 }
 

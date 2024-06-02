@@ -139,11 +139,11 @@ int sw_codec_encode(void *pcm_data, size_t pcm_size, uint8_t **encoded_data, siz
 		switch (m_config.encoder.channel_mode) {
 		case SW_CODEC_MONO: {
 
-			if (IS_ENABLED(CONFIG_SD_CARD_PLAYBACK)) {
-				if (sd_card_playback_is_active()) {
-					sd_card_playback_mix_with_stream(pcm_data_mono_ptrs[AUDIO_CH_L], pcm_block_size_mono);
-				}
-			}
+			// if (IS_ENABLED(CONFIG_SD_CARD_PLAYBACK)) {
+			// 	if (sd_card_playback_is_active()) {
+			// 		sd_card_playback_mix_with_stream(pcm_data_mono_ptrs[AUDIO_CH_L], pcm_block_size_mono);
+			// 	}
+			// }
 
 			ret = sw_codec_lc3_enc_run(pcm_data_mono_ptrs[AUDIO_CH_L],
 						   pcm_block_size_mono, LC3_USE_BITRATE_FROM_INIT,
@@ -155,6 +155,11 @@ int sw_codec_encode(void *pcm_data, size_t pcm_size, uint8_t **encoded_data, siz
 			break;
 		}
 		case SW_CODEC_STEREO: {
+			if (IS_ENABLED(CONFIG_SD_CARD_PLAYBACK)) {
+				if (sd_card_playback_is_active()) {
+					sd_card_playback_mix_with_stream(pcm_data_mono_ptrs[AUDIO_CH_L], pcm_block_size_mono);
+				}
+			}
 			ret = sw_codec_lc3_enc_run(pcm_data_mono_ptrs[AUDIO_CH_L],
 						   pcm_block_size_mono, LC3_USE_BITRATE_FROM_INIT,
 						   AUDIO_CH_L, sizeof(m_encoded_data),

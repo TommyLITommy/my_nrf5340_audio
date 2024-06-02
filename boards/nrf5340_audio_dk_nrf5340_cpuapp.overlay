@@ -9,6 +9,10 @@
             gpios = < &gpio1 0xd 0 >;
             label = "debug gpio p1.13";
         };
+        debug03: dbg03 {
+            gpios = < &gpio1 0xe 0 >;
+            label = "debug gpio P1.14";
+        };
     };
     aliases {
         debug01 = &debug01;

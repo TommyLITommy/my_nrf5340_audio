@@ -509,7 +509,8 @@ int broadcast_source_enable(void)
 	}
 
 	/* Create advertising set */
-	ret = adv_create(broadcast_src_name);
+	// ret = adv_create(broadcast_src_name);
+	ret = adv_create(NULL);
 	if (ret) {
 		LOG_ERR("Failed to create advertising set");
 		return ret;

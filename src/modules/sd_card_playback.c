@@ -135,13 +135,13 @@ static int sd_card_playback_ringbuf_write(uint8_t *buffer, size_t numbytes)
 	/* The ringbuffer is read every 10 ms by audio datapath when SD card playback is enabled.
 	 * Timeout value should therefore not be less than 10 ms
 	 */
-	// ret = k_sem_take(&m_sem_ringbuf_space_available, K_MSEC(5));
-	// // ret = k_sem_take(&m_sem_ringbuf_space_available, K_FOREVER);
-	// if (ret) {
-	// 	LOG_ERR("Sem take err: %d. Skipping frame", ret);
-	// 	return ret;
-	// }
-	k_sleep(K_MSEC(5));
+	ret = k_sem_take(&m_sem_ringbuf_space_available, K_MSEC(20));
+	// ret = k_sem_take(&m_sem_ringbuf_space_available, K_FOREVER);
+	if (ret) {
+		LOG_ERR("Sem take err: %d. Skipping frame", ret);
+		return ret;
+	}
+	// k_sleep(K_MSEC(5));
 
 	ret = k_mutex_lock(&mtx_ringbuf, K_NO_WAIT);
 	if (ret) {
@@ -238,13 +238,17 @@ static int sd_card_playback_play_wav(void)
 	n_iter = ceil((float)audio_length_bytes / (float)wav_read_size);
 
 	for (int i = 0; i < n_iter; i++) {
-		debug_gpio_toggle(DEBUG_GPIO_ID_P1_13);
+		// debug_gpio_toggle(DEBUG_GPIO_ID_P1_13);
 		/* Read a chunk of audio data from file */
+
+		// Measure the duration of sd card reading 960bytes data.
+		debug_gpio_set_level(DEBUG_GPIO_ID_P1_13, 1);
 		ret = sd_card_read(pcm_mono_frame, &wav_read_size, &f_seg_read_entry);
 		if (ret < 0) {
 			LOG_ERR("SD card read err: %d", ret);
 			break;
 		}
+		debug_gpio_set_level(DEBUG_GPIO_ID_P1_13,0);
 
 		/* Write audio data to the ringbuffer */
 		ret = sd_card_playback_ringbuf_write(pcm_mono_frame, wav_read_size);
