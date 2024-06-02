@@ -12,7 +12,8 @@
 #include <zephyr/shell/shell.h>
 
 #include "sd_card.h"
-#include "sw_codec_lc3.h"
+// #include "sw_codec_lc3.h"
+#include "sw_codec_google_lc3.h"
 #include "sw_codec_select.h"
 #include "pcm_mix.h"
 #include "audio_system.h"

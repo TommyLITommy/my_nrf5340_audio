@@ -14,6 +14,7 @@ set(SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/sd_card.c
   ${CMAKE_CURRENT_SOURCE_DIR}/my_player.c
   ${CMAKE_CURRENT_SOURCE_DIR}/debug_gpio.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/sw_codec_google_lc3.c
 )
 
 if (CONFIG_AUDIO_SYNC_TIMER_USES_RTC)
