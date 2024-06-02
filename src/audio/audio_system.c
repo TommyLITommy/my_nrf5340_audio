@@ -404,6 +404,10 @@ void audio_system_start(void)
 		ERR_CHK(ret);
 	}
 
+// jusf for temproray use
+extern int sd_card_playback_fifo_init(struct data_fifo *fifo_tx_in, struct data_fifo *fifo_rx_in);
+	sd_card_playback_fifo_init(&fifo_tx, &fifo_rx);
+
 #if ((CONFIG_AUDIO_SOURCE_USB) && (CONFIG_AUDIO_DEV == GATEWAY))
 	ret = audio_usb_start(&fifo_tx, &fifo_rx);
 	ERR_CHK(ret);

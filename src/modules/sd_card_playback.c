@@ -17,7 +17,10 @@
 #include "pcm_mix.h"
 #include "audio_system.h"
 #include "zephyr/kernel.h"
+
 #include "debug_gpio.h"
+#include "macros_common.h"
+#include "data_fifo.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(sd_card_playback, CONFIG_MODULE_SD_CARD_PLAYBACK_LOG_LEVEL);
@@ -95,6 +98,9 @@ static struct wav_header wav_file_header;
 static struct lc3_playback_config lc3_playback_cfg;
 
 static struct fs_file_t f_seg_read_entry;
+
+static struct data_fifo *fifo_tx;
+static struct data_fifo *fifo_rx;
 
 static int sd_card_playback_ringbuf_read(uint8_t *buf, size_t *size)
 {
@@ -235,6 +241,10 @@ static int sd_card_playback_play_wav(void)
 	uint8_t pcm_mono_frame[wav_read_size];
 
 	audio_length_bytes = wav_file_header.wav_size + 8 - sizeof(wav_file_header);
+	// n_iter = ceil((float)audio_length_bytes / (float)wav_read_size);
+
+	// 1920bytes for 10ms
+	wav_read_size = wav_read_size * 10;
 	n_iter = ceil((float)audio_length_bytes / (float)wav_read_size);
 
 	for (int i = 0; i < n_iter; i++) {
@@ -250,12 +260,30 @@ static int sd_card_playback_play_wav(void)
 		}
 		debug_gpio_set_level(DEBUG_GPIO_ID_P1_13,0);
 
-		/* Write audio data to the ringbuffer */
-		ret = sd_card_playback_ringbuf_write(pcm_mono_frame, wav_read_size);
-		if (ret < 0) {
-			LOG_ERR("Load ringbuf err: %d", ret);
-			break;
+		void *data_in;
+		ret = data_fifo_pointer_first_vacant_get(fifo_rx, &data_in, K_NO_WAIT);
+		if (ret == -ENOMEM) {
+			LOG_ERR("Not enough mem for wav chunck");
+			continue;
 		}
+
+		ERR_CHK_MSG(ret, "Rx failed to get block");
+		
+		memcpy(data_in, pcm_mono_frame, wav_read_size);
+
+		ret = data_fifo_block_lock(fifo_rx, &data_in, wav_read_size);
+		ERR_CHK_MSG(ret, "Failed to lock block");
+
+		// /* Write audio data to the ringbuffer */
+		// ret = sd_card_playback_ringbuf_write(pcm_mono_frame, wav_read_size);
+		// if (ret < 0) {
+		// 	LOG_ERR("Load ringbuf err: %d", ret);
+		// 	break;
+		// }
+		
+		// firstly measure the time of sdcard read 10ms data
+		k_sleep(K_MSEC(10));
+
 
 		if (i == 0) {
 			/* Data can now be read from the ringbuffer */
@@ -470,6 +498,19 @@ int sd_card_playback_mix_with_stream(void *const pcm_a, size_t pcm_a_size)
 	} else {
 		LOG_WRN("Size read from ringbuffer: %d. Skipping", read_size);
 	}
+
+	return 0;
+}
+
+int sd_card_playback_fifo_init(struct data_fifo *fifo_tx_in, struct data_fifo *fifo_rx_in)
+{
+	LOG_INF("sd_card_playback_fifo_init");
+	if (fifo_tx_in == NULL || fifo_rx_in == NULL) {
+		return -EINVAL;
+	}
+
+	fifo_tx = fifo_tx_in;
+	fifo_rx = fifo_rx_in;
 
 	return 0;
 }

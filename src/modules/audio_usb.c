@@ -196,6 +196,10 @@ int audio_usb_disable(void)
 int audio_usb_init(void)
 {
 	int ret;
+
+	LOG_INF("audio_usb_init just return, not use usb");
+	return 0;
+
 	const struct device *hs_dev = DEVICE_DT_GET(DT_NODELABEL(hs_0));
 
 	if (!device_is_ready(hs_dev)) {
