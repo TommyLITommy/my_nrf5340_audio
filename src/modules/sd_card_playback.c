@@ -179,10 +179,10 @@ static int sd_card_playback_check_wav_header(struct wav_header wav_file_header)
 		return -EPERM;
 	}
 
-	if (wav_file_header.num_channels != SW_CODEC_MONO) {
-		LOG_ERR("This is not a MONO file");
-		return -EPERM;
-	}
+	// if (wav_file_header.num_channels != SW_CODEC_MONO) {
+	// 	LOG_ERR("This is not a MONO file");
+	// 	return -EPERM;
+	// }
 
 	if (wav_file_header.sample_rate != WAV_SAMPLE_RATE_48K) {
 		LOG_ERR("Unsupported sample rate: %d", wav_file_header.sample_rate);
@@ -196,6 +196,8 @@ static int sd_card_playback_check_wav_header(struct wav_header wav_file_header)
 
 	return 0;
 }
+
+static uint8_t pcm_mono_frame[2048];
 
 static int sd_card_playback_play_wav(void)
 {
@@ -238,13 +240,12 @@ static int sd_card_playback_play_wav(void)
 	/* Size corresponding to frame size of audio BT stream */
 	pcm_frame_size = wav_file_header.byte_rate * FRAME_DURATION_MS / 1000;
 	wav_read_size = pcm_frame_size;
-	uint8_t pcm_mono_frame[wav_read_size];
+	// uint8_t pcm_mono_frame[wav_read_size];
 
 	audio_length_bytes = wav_file_header.wav_size + 8 - sizeof(wav_file_header);
 	// n_iter = ceil((float)audio_length_bytes / (float)wav_read_size);
 
 	// 1920bytes for 10ms
-	wav_read_size = wav_read_size * 10;
 	n_iter = ceil((float)audio_length_bytes / (float)wav_read_size);
 
 	for (int i = 0; i < n_iter; i++) {
@@ -282,7 +283,7 @@ static int sd_card_playback_play_wav(void)
 		// }
 		
 		// firstly measure the time of sdcard read 10ms data
-		k_sleep(K_MSEC(10));
+		k_sleep(K_MSEC(8));
 
 
 		if (i == 0) {
