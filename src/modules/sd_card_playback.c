@@ -283,7 +283,7 @@ static int sd_card_playback_play_wav(void)
 		// }
 		
 		// firstly measure the time of sdcard read 10ms data
-		k_sleep(K_MSEC(8));
+		// k_sleep(K_MSEC(2));
 
 
 		if (i == 0) {
